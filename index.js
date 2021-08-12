@@ -8,15 +8,6 @@ const websocketClient = require("ws");
 
 const util = require("util");
 const events = require("events");
-const {
-  DYNAMIC_LOGVARIABLE,
-  FASTLOG1,
-  DFLog,
-  FASTLOGS,
-  FASTLOG,
-  FASTLOG2,
-} = require("./FastLog");
-DYNAMIC_LOGVARIABLE("SignalRConnection", 7);
 
 /**
  * A signalR client for node.js which support ASP.net but not ASP.net Core.
@@ -28,18 +19,6 @@ class signalrClient {
    * @param {string[]} hubs
    */
   constructor(url, hubs) {
-    FASTLOG1(
-      7,
-      "[DFLog::SignalRConnection] SignalRConnection::initializeConnection url[%s]\n",
-      url
-    );
-    hubs.forEach((hub) => {
-      FASTLOG1(
-        7,
-        "[DFLog::SignalRConnection] SignalR hubProxy [%s] created\n",
-        hub
-      );
-    });
     this.url = url;
     this.headers = {};
     this.query = {};
@@ -65,12 +44,6 @@ class signalrClient {
   }
 
   _receiveMessage(message) {
-    FASTLOG2(
-      7,
-      "[DFLog::SignalRConnection] SignalR:  %s [message     ] processing message: %s\n",
-      new Date(Date.now()).toISOString(),
-      message.data
-    );
     this._markLastMessage();
     if (message.type === "message" && message.data != "{}") {
       let data = JSON.parse(message.data);
@@ -99,12 +72,7 @@ class signalrClient {
       A: args,
       I: this._invocationId,
     });
-    FASTLOG2(
-      7,
-      "[DFLog::SignalRConnection] SignalR:  %s [info        ] sending data: %s\n",
-      new Date(Date.now()).toISOString(),
-      payload
-    );
+
     ++this._invocationId;
     if (
       this._websocket &&
@@ -183,12 +151,7 @@ class signalrClient {
       tid: 10,
       ...this.query,
     });
-    FASTLOG2(
-      7,
-      "[DFLog::SignalRConnection] SignalR:  %s [info        ] [websocket transport] connecting to: %s\b",
-      new Date(Date.now()).toISOString(),
-      `${url}/connect?${query}`
-    );
+
     let ws = new websocketClient(`${url}/connect?${query}`, {
       handshakeTimeout: this.requestTimeout,
       headers: { ...this.headers, "User-Agent": "WebSocket++/0.5.1" },
@@ -198,11 +161,6 @@ class signalrClient {
       this._callTimeout = 0;
       this._start()
         .then(() => {
-          FASTLOGS(
-            7,
-            "[DFLog::SignalRConnection] SignalR:  %s [state change] connecting -> connected\n",
-            new Date(Date.now()).toISOString()
-          );
           this._reconnectCount = 0;
           this.emit("connected");
           this.connection.state = connectionState.connected;
@@ -366,12 +324,7 @@ class signalrClient {
 
   _error(code, ex = null) {
     this.emit("error", code, ex);
-    FASTLOG2(
-      7,
-      "[DFLog::SignalRConnection] SignalR:  %s [error       ] [websocket transport] error receiving response from websocket: %s\n",
-      new Date(Date.now()).toISOString(),
-      ex
-    );
+
     if (code === errorCode.negotiateError || code === errorCode.connectError) {
       this._reconnect(true);
     }
@@ -381,47 +334,16 @@ class signalrClient {
   }
 
   _close() {
-    FASTLOGS(
-      7,
-      "[DFLog::SignalRConnection] SignalR:  %s [info        ] stopping connection\n",
-      new Date(Date.now()).toISOString()
-    );
-    FASTLOGS(
-      7,
-      "[DFLog::SignalRConnection] SignalR:  %s [info        ] acquired lock in shutdown()\n",
-      new Date(Date.now()).toISOString()
-    );
-    FASTLOGS(
-      7,
-      "[DFLog::SignalRConnection] SignalR:  %s [state change] connected -> disconnecting\n",
-      new Date(Date.now()).toISOString()
-    );
     if (this._websocket) {
       this._websocket.onclose = () => {};
       this._websocket.onmessage = () => {};
       this._websocket.onerror = () => {};
       this._websocket.close();
       this._websocket = undefined;
-      FASTLOGS(
-        7,
-        "[DFLog::SignalRConnection] SignalR:  %s [state change] disconnecting -> disconnected\n",
-        new Date(Date.now()).toISOString()
-      );
-      FASTLOGS(
-        7,
-        "[DFLog::SignalRConnection] SignalR:  %s [info        ] acquired lock in shutdown()\n",
-        new Date(Date.now()).toISOString()
-      );
     }
   }
 
   start() {
-    FASTLOG(7, "[DFLog::SignalRConnection] SignalRConnection::startAsync\n");
-    FASTLOGS(
-      7,
-      "[DFLog::SignalRConnection] SignalR:  %s [state change] disconnected -> connecting\n",
-      new Date(Date.now()).toISOString()
-    );
     if (!this._bound) {
       if (!this.url) {
         this._error(errorCode.invalidURL);
