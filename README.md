@@ -5,7 +5,7 @@ A signalR client for node.js which support ASP.net but not ASP.net Core. For ASP
 ## Installation
 
 ```bash
-$ npm install @mfd/node-signalr
+$ npm install @mfd/signalr
 ```
 
 ## Usage
