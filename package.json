@@ -1,7 +1,7 @@
 {
   "name": "@mfd/signalr",
   "version": "2.0.0",
-  "description": "A signalR client for node.js, made by MFD.",
+  "description": "A signalR client for node.js, this was modified by MFDLABS to add support for things that were not present.",
   "main": "index.js",
   "keywords": [
     "signalr",
@@ -9,9 +9,9 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/mfd-nsg/node-signalr-client.git"
+    "url": "https://github.com/mfdlabs/node-signalr-client.git"
   },
-  "author": "ROBLOX",
+  "author": "Nikita Petko <petko@vmminfra.net>",
   "license": "MIT",
   "dependencies": {
     "ws": "^7.2.0"
